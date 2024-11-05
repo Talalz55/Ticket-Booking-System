@@ -1,0 +1,32 @@
+﻿@model Event
+
+<h2>Create Event</h2>
+
+<form asp-action="Create" method="post">
+    <div>
+        <label asp-for="Title"></label>
+        <input asp-for="Title" />
+        <span asp-validation-for="Title"></span>
+    </div>
+    <div>
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description"></textarea>
+        <span asp-validation-for="Description"></span>
+    </div>
+    <div>
+        <label asp-for="Date"></label>
+        <input asp-for="Date" type="datetime-local" />
+        <span asp-validation-for="Date"></span>
+    </div>
+    <div>
+        <label asp-for="IsPublic"></label>
+        <input asp-for="IsPublic" type="checkbox" />
+    </div>
+    <button type="submit">Create Event</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
