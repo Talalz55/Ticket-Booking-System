@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Event Management and Ticket Booking System", "Event Management and Ticket Booking System\Event Management and Ticket Booking System.csproj", "{2651C956-8E27-456D-855E-3B95C28AFEE9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2651C956-8E27-456D-855E-3B95C28AFEE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2651C956-8E27-456D-855E-3B95C28AFEE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2651C956-8E27-456D-855E-3B95C28AFEE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2651C956-8E27-456D-855E-3B95C28AFEE9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4F9EE441-8808-41B0-93E8-858EA0D2DF9B}
+	EndGlobalSection
+EndGlobal
