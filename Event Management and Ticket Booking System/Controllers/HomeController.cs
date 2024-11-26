@@ -1,4 +1,5 @@
 using Event_Management_and_Ticket_Booking_System.Models;
+using Event_Management_and_Ticket_Booking_System.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 

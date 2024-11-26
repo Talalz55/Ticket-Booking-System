@@ -1,13 +1,15 @@
 ﻿using Event_Management_and_Ticket_Booking_System.Models;
+using Event_Management_and_Ticket_Booking_System.Models.Entities;
+using Event_Management_and_Ticket_Booking_System.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Event_Management_and_Ticket_Booking_System.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly EventDbContext _context;
+        private readonly AppDbContext _context;
 
-        public AdminController(EventDbContext context)
+        public AdminController(AppDbContext context)
         {
             _context = context;
         }
