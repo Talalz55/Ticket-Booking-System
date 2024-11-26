@@ -1,0 +1,19 @@
+﻿@using Event_Management_and_Ticket_Booking_System.Models.Entities
+@using Event_Management_and_Ticket_Booking_System.Models.ViewModels
+@model Cart
+
+<h2>Your Cart</h2>
+
+@foreach (var item in Model.CartItems)
+{
+    <div>
+        <h4>@item.Quantity x @item.Type Ticket</h4>
+        <p>Total Price: @item.TotalPrice</p>
+    </div>
+}
+
+<h3>Total Amount: @Model.TotalAmount</h3>
+
+<form method="post" asp-action="Checkout">
+    <button type="submit">Proceed to Checkout</button>
+</form>
