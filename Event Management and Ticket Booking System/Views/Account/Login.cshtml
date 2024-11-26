@@ -1,24 +1,41 @@
-﻿@model LoginViewModel
+﻿@using Event_Management_and_Ticket_Booking_System.Models.Entities
+@using Event_Management_and_Ticket_Booking_System.Models.ViewModels
+@model LoginViewModel
 
-<h2>Login</h2>
+@{
+    ViewData["Title"] = "Login";
+}
 
-<form asp-action="Login" method="post">
-    <div>
-        <label asp-for="Email"></label>
-        <input asp-for="Email" />
-        <span asp-validation-for="Email"></span>
+<h2>@ViewData["Title"]</h2>
+
+<form method="post" asp-action="Login">
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
     </div>
-    <div>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" />
-        <span asp-validation-for="Password"></span>
+
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
     </div>
-    <div>
-        <input asp-for="RememberMe" type="checkbox" />
-        <label asp-for="RememberMe">Remember me</label>
+
+    <div class="form-group">
+        <div class="form-check">
+            <input asp-for="RememberMe" class="form-check-input" />
+            <label class="form-check-label" for="RememberMe">
+                @Html.DisplayNameFor(model => model.RememberMe)
+            </label>
+        </div>
     </div>
-    <button type="submit">Login</button>
+
+    <button type="submit" class="btn btn-primary">Login</button>
 </form>
+
+<div>
+    <a href="@Url.Action("Register", "Account")">Don't have an account? Register here</a>
+</div>
 
 @section Scripts {
     @{

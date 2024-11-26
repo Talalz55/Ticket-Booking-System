@@ -1,24 +1,50 @@
-﻿@model RegisterViewModel
+﻿@using Event_Management_and_Ticket_Booking_System.Models.Entities
+@using Event_Management_and_Ticket_Booking_System.Models.ViewModels
 
-<h2>Register</h2>
+@model RegisterViewModel
 
-<form asp-action="Register" method="post">
-    <div>
-        <label asp-for="Email"></label>
-        <input asp-for="Email" />
-        <span asp-validation-for="Email"></span>
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Register" method="post" class="form-horizontal">
+    <div class="form-group">
+        <label for="FullName" class="control-label">Full Name</label>
+        <input asp-for="FullName" class="form-control" id="FullName" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
     </div>
-    <div>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" />
-        <span asp-validation-for="Password"></span>
+
+    <div class="form-group">
+        <label for="Email" class="control-label">Email</label>
+        <input asp-for="Email" class="form-control" id="Email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
     </div>
-    <div>
-        <label asp-for="ConfirmPassword"></label>
-        <input asp-for="ConfirmPassword" type="password" />
-        <span asp-validation-for="ConfirmPassword"></span>
+
+    <div class="form-group">
+        <label for="Password" class="control-label">Password</label>
+        <input asp-for="Password" class="form-control" id="Password" type="password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
     </div>
-    <button type="submit">Register</button>
+
+    <div class="form-group">
+        <label for="ConfirmPassword" class="control-label">Confirm Password</label>
+        <input asp-for="ConfirmPassword" class="form-control" id="ConfirmPassword" type="password" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Role" class="control-label">Role</label>
+        <select asp-for="Role" class="form-control" id="Role">
+            <option value="Organizer">Organizer</option>
+            <option value="Attendee">Attendee</option>
+            <option value="Admin">Admin</option>
+        </select>
+        <span asp-validation-for="Role" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
 </form>
 
 @section Scripts {
