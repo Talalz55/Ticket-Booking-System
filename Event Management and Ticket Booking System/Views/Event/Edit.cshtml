@@ -1,0 +1,63 @@
+﻿@using Event_Management_and_Ticket_Booking_System.Models.Entities
+@using Event_Management_and_Ticket_Booking_System.Models.ViewModels
+@model Event
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Title, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Title, null, new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Description, new { @class = "form-label" })
+        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = 3 })
+        @Html.ValidationMessageFor(m => m.Description, null, new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Date, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Date, new { @class = "form-control", type = "datetime-local" })
+        @Html.ValidationMessageFor(m => m.Date, null, new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Venue, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Venue, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Venue, null, new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Category, new { @class = "form-label" })
+        @Html.DropDownListFor(m => m.Category, Enum.GetValues(typeof(EventCategory))
+                .Cast<EventCategory>()
+                .Select(c => new SelectListItem
+    {
+        Text = c.ToString(),
+        Value = c.ToString()
+    }), "--Select Category--", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Category, null, new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Price, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Price, new { @class = "form-control", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(m => m.Price, null, new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.IsPublic, new { @class = "form-label" })
+        @Html.CheckBoxFor(m => m.IsPublic)
+        @Html.ValidationMessageFor(m => m.IsPublic, null, new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+}
+
+<a href="@Url.Action("Index")">Back to Event List</a>
