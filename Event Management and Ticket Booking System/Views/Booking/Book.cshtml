@@ -1,0 +1,20 @@
+﻿@model Event_Management_and_Ticket_Booking_System.Models.Entities.Event
+
+<h2>Book Event</h2>
+
+<p><strong>Event:</strong> @Model.Name</p>
+<p><strong>Category:</strong> @Model.Category</p>
+<p><strong>Date:</strong> @Model.Date.ToString("MM/dd/yyyy")</p>
+<p><strong>Venue:</strong> @Model.Venue</p>
+<p><strong>Base Price:</strong> @Model.BasePrice.ToString("C")</p>
+<p><strong>Available Seats:</strong> @Model.AvailableSeats</p>
+
+<form asp-action="Confirm" method="post">
+    <input type="hidden" name="eventId" value="@Model.Id" />
+    <div class="form-group">
+        <label for="quantity">Number of Tickets:</label>
+        <input type="number" name="quantity" class="form-control" min="1" max="@Model.AvailableSeats" value="1" />
+    </div>
+    <button type="submit" class="btn btn-primary">Confirm Booking</button>
+    <a asp-action="Details" asp-controller="Event" asp-route-id="@Model.Id" class="btn btn-secondary">Cancel</a>
+</form>
