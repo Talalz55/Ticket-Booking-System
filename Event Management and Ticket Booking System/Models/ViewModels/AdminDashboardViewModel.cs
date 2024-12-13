@@ -4,7 +4,7 @@ namespace Event_Management_and_Ticket_Booking_System.Models.ViewModels
 {
     public class AdminDashboardViewModel
     {
-        public List<User> Users { get; set; }
+        public List<ApplicationUser> Users { get; set; }
         public List<Event> Events { get; set; }
 
         // You can add more properties as needed for stats or additional functionality

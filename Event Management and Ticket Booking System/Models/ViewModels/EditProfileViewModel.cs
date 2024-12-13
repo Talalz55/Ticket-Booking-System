@@ -2,17 +2,13 @@
 
 namespace Event_Management_and_Ticket_Booking_System.Models.ViewModels
 {
-    public class LoginViewModel
+    public class EditProfileViewModel
     {
         [Required]
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        [Display(Name = "Remember Me")]
-        public bool RememberMe { get; set; }
+        [Phone]
+        public string PhoneNumber { get; set; }
     }
 }
