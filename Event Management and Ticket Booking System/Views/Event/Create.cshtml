@@ -1,132 +1,53 @@
 ﻿@using Event_Management_and_Ticket_Booking_System.Models.Entities
 @using Event_Management_and_Ticket_Booking_System.Models.ViewModels
 @model Event
-
 @{
     ViewData["Title"] = "Create Event";
 }
 
-<h2>Create Event</h2>
+<h2 class="page-title">Create Event</h2>
 
-<form asp-action="Create" asp-controller="Event" method="post" enctype="multipart/form-data">
-    @if (ViewBag.Errors != null && ViewBag.Errors.Count > 0)
-    {
-        <div class="alert alert-danger">
-            <h4>Validation Errors:</h4>
-            <ul>
-                @foreach (var error in ViewBag.Errors)
-                {
-                    <li>@error</li>
-                }
-            </ul>
+@using (Html.BeginForm("Create", "Event", FormMethod.Post))
+{
+    <div class="form-container">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Name, htmlAttributes: new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.Name, new { @class = "form-input" })
+            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "form-error" })
         </div>
-    }
-    <div class="form-group">
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-        @Html.LabelFor(m => m.Title, "Title", new { @class = "form-label" })
-        @Html.EditorFor(m => m.Title, new { htmlAttributes = new { @class = "form-control" } })
-        @Html.ValidationMessageFor(m => m.Title, null, new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.Description, "Description", new { @class = "form-label" })
-        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = 3 })
-        @Html.ValidationMessageFor(m => m.Description, null, new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.Date, "Date", new { @class = "form-label" })
-        @Html.EditorFor(m => m.Date, new { htmlAttributes = new { @class = "form-control", type = "datetime-local" } })
-        @Html.ValidationMessageFor(m => m.Date, null, new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.Venue, "Venue", new { @class = "form-label" })
-        @Html.EditorFor(m => m.Venue, new { htmlAttributes = new { @class = "form-control" } })
-        @Html.ValidationMessageFor(m => m.Venue, null, new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.Price, "Base Ticket Price", new { @class = "form-label" })
-        @Html.EditorFor(m => m.Price, new { htmlAttributes = new { @class = "form-control", type = "number", step = "0.01" } })
-        @Html.ValidationMessageFor(m => m.Price, null, new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.Category, "Category", new { @class = "form-label" })
-        @Html.DropDownListFor(
-                 m => m.Category,
-                 new SelectList(Enum.GetValues(typeof(EventCategory))),
-                 "Select a Category",
-                 new { @class = "form-control" }
-                 )
-        @Html.ValidationMessageFor(m => m.Category, null, new { @class = "text-danger" })
-    </div>
-    <div class="form-group form-check">
-        <label class="form-check-label">
-            @Html.CheckBoxFor(m => m.IsPublic, new { @class = "form-check-input" })
-            Is Public
-        </label>
-        @Html.ValidationMessageFor(m => m.IsPublic, null, new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.TotalSeats, "Total Seats", new { @class = "form-label" })
-        @Html.EditorFor(m => m.TotalSeats, new { htmlAttributes = new { @class = "form-control", type = "number", step = "1" } })
-        @Html.ValidationMessageFor(m => m.TotalSeats, null, new { @class = "text-danger" })
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.ReservedSeats, "Reserved Seats", new { @class = "form-label" })
-        @Html.EditorFor(m => m.ReservedSeats, new { htmlAttributes = new { @class = "form-control", type = "number", step = "1" } })
-        @Html.ValidationMessageFor(m => m.ReservedSeats, null, new { @class = "text-danger" })
-    </div>
-
-    @* <div id="sessions-container">
-        <h4>Sessions</h4>
-        <div class="form-group session-group">
-            <label for="SessionTitle">Session Title</label>
-            <input type="text" class="form-control" name="Sessions[0].Title" required />
-
-            <label for="Speaker">Speaker</label>
-            <input type="text" class="form-control" name="Sessions[0].Speaker" required />
-
-            <label for="StartTime">Start Time</label>
-            <input type="datetime-local" class="form-control" name="Sessions[0].StartTime" required />
-
-            <label for="EndTime">End Time</label>
-            <input type="datetime-local" class="form-control" name="Sessions[0].EndTime" required />
+        <div class="form-group">
+            @Html.LabelFor(m => m.Description, htmlAttributes: new { @class = "form-label" })
+            @Html.TextAreaFor(m => m.Description, new { @class = "form-textarea", rows = 5 })
+            @Html.ValidationMessageFor(m => m.Description, "", new { @class = "form-error" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Category, htmlAttributes: new { @class = "form-label" })
+            @Html.DropDownListFor(m => m.Category, new SelectList(Enum.GetValues(typeof(EventCategory))), "-- Select Category --", new { @class = "form-select" })
+            @Html.ValidationMessageFor(m => m.Category, "", new { @class = "form-error" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Venue, htmlAttributes: new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.Venue, new { @class = "form-input" })
+            @Html.ValidationMessageFor(m => m.Venue, "", new { @class = "form-error" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Date, htmlAttributes: new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.Date, "{0:yyyy-MM-dd}", new { @class = "form-input", type = "date" })
+            @Html.ValidationMessageFor(m => m.Date, "", new { @class = "form-error" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.BasePrice, htmlAttributes: new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.BasePrice, new { @class = "form-input" })
+            @Html.ValidationMessageFor(m => m.BasePrice, "", new { @class = "form-error" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.TotalSeats, htmlAttributes: new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.TotalSeats, new { @class = "form-input" })
+            @Html.ValidationMessageFor(m => m.TotalSeats, "", new { @class = "form-error" })
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
         </div>
     </div>
-    <button type="button" id="add-session-btn" class="btn btn-secondary">Add Session</button> *@
-
-    <button type="submit" class="btn btn-primary">Create Event</button>
-</form>
-
-@section Scripts {
-    <script>
-        let sessionCount = 1;
-        document.getElementById("add-session-btn").addEventListener("click", function () {
-            const container = document.getElementById("sessions-container");
-            const newSession = document.createElement("div");
-            newSession.classList.add("form-group", "session-group");
-
-            newSession.innerHTML = `
-                        <label for="SessionTitle">Session Title</label>
-                        <input type="text" class="form-control" name="Sessions[${sessionCount}].Title" required />
-
-                        <label for="Speaker">Speaker</label>
-                        <input type="text" class="form-control" name="Sessions[${sessionCount}].Speaker" required />
-
-                        <label for="StartTime">Start Time</label>
-                        <input type="datetime-local" class="form-control" name="Sessions[${sessionCount}].StartTime" required />
-
-                        <label for="EndTime">End Time</label>
-                        <input type="datetime-local" class="form-control" name="Sessions[${sessionCount}].EndTime" required />
-                    `;
-            container.appendChild(newSession);
-            sessionCount++;
-        });
-    </script>
 }

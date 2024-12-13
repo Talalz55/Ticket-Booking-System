@@ -3,41 +3,33 @@
 @model Event
 
 @{
-    ViewData["Title"] = "Event Details";
+    ViewData["Title"] = Model.Name;
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2>@Model.Name</h2>
 
-<div class="card">
-    <div class="card-header">
-        <h3>@Model.Title</h3>
-    </div>
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Description</dt>
-            <dd class="col-sm-9">@Model.Description</dd>
+<p><strong>Category:</strong> @Model.Category</p>
+<p><strong>Description:</strong> @Model.Description</p>
+<p><strong>Date:</strong> @Model.Date.ToString("MM/dd/yyyy")</p>
+<p><strong>Venue:</strong> @Model.Venue</p>
+<p><strong>Base Price:</strong> @Model.BasePrice.ToString("C")</p>
 
-            <dt class="col-sm-3">Date</dt>
-            <dd class="col-sm-9">@Model.Date.ToString("f")</dd>
-
-            <dt class="col-sm-3">Venue</dt>
-            <dd class="col-sm-9">@Model.Venue</dd>
-
-            <dt class="col-sm-3">Category</dt>
-            <dd class="col-sm-9">@Model.Category</dd>
-
-            <dt class="col-sm-3">Public</dt>
-            <dd class="col-sm-9">@Model.IsPublic ? "Yes" : "No"</dd>
-
-            <dt class="col-sm-3">Price</dt>
-            <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
-
-            <dt class="col-sm-3">Organizer</dt>
-            <dd class="col-sm-9">@Model.Organizer?.FullName</dd>
-        </dl>
-    </div>
-    <div class="card-footer">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-    </div>
-</div>
+@if (Model.AvailableSeats > 0)
+{
+    <p><strong>Available Seats:</strong> @Model.AvailableSeats</p>
+    <!-- Form for adding tickets to cart -->
+    <form asp-action="Add" asp-controller="Cart" method="post">
+        <input type="hidden" name="eventId" value="@Model.Id" />
+        
+        <div class="form-group">
+            <label for="quantity"><strong>Quantity:</strong></label>
+            <input type="number" name="quantity" class="form-control" min="1" max="@Model.AvailableSeats" value="1" style="width: 100px; display: inline-block;" />
+        </div>
+        <button type="submit" class="btn btn-primary">Add to Cart</button>
+    </form>
+}
+else
+{
+    <p class="text-danger"><strong>No seats available!</strong></p>
+}
+<a asp-action="Index" class="btn btn-secondary">Back to Events</a>

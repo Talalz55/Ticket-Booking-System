@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Runtime.ConstrainedExecution;
 using System.Security.Claims;
 
 namespace Event_Management_and_Ticket_Booking_System.Controllers
@@ -16,195 +17,187 @@ namespace Event_Management_and_Ticket_Booking_System.Controllers
         {
             _context = context;
         }
-        [HttpGet]
-        public IActionResult Index()
+        // GET: /Event
+        [AllowAnonymous]
+        public async Task<IActionResult> Index(string search, EventCategory? category, string sortOrder)
         {
-            var events = _context.Events.Include(e => e.Organizer).ToList();
+            var events = await _context.Events
+        .OrderBy(e => e.Name)
+        .ToListAsync();
+
             return View(events);
         }
 
-        [HttpGet]
+        // GET: /Event/Details/{id}
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int id)
+        {
+            var eventDetails = await _context.Events
+                .Include(e => e.Tickets)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (eventDetails == null)
+            {
+                return NotFound();
+            }
+
+            return View(eventDetails);
+        }
+
+        // GET: /Event/Create
+        [Authorize(Roles = "Organizer")]
         public IActionResult Create()
         {
-            // Populate categories for the dropdown list
-            ViewBag.Categories = Enum.GetValues(typeof(EventCategory)).Cast<EventCategory>().ToList();
             return View();
         }
 
+        // POST: /Event/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Organizer")]
         public async Task<IActionResult> Create(Event model)
         {
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
-                                      .ToList();
-            ViewBag.Errors = errors;
-            /*if (!ModelState.IsValid)
-                return View(model);*/
-
-
-            model.OrganizerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // Add the event to the database
-            _context.Events.Add(model);
-            await _context.SaveChangesAsync();
-
-
-            // Generate tickets for the event
-            var tickets = new List<Ticket>();
-            for (int i = 1; i <= model.TotalSeats; i++)
+            if (model != null)
             {
-                tickets.Add(new Ticket
-                {
-                    EventId = model.Id,
-                    TicketNumber = $"Seat-{i}",
-                    Type = TicketType.Regular // Default type, can be customized
-                });
-            }
+                model.AvailableSeats = model.TotalSeats;
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            // Save tickets to the database
-            _context.Tickets.AddRange(tickets);
-            await _context.SaveChangesAsync();
+                model.OrganizerId = userId;
 
-            return RedirectToAction("Index");
-        }
-
-       /* [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Event @event)
-        {
-            if (ModelState.IsValid)
-            {
-                // Set the organizer (logged-in user)
-                @event.OrganizerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                _context.Add(@event);
+                _context.Events.Add(model);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index)); // Redirect to event listing
+
+
+                var ticket = new Ticket
+                {
+                    EventId = model.Id, // Use the event ID from the saved model
+                    Type = TicketType.Regular, // Default ticket type; adjust as needed
+                    Price = model.BasePrice,
+                    IsReserved = false // Tickets are not reserved initially
+                };
+                /*// Generate tickets for the event
+                var tickets = new List<Ticket>();
+                for (int i = 0; i < model.TotalSeats; i++)
+                {
+                    tickets.Add(new Ticket
+                    {
+                        EventId = model.Id, // Use the event ID from the saved model
+                        Type = TicketType.Regular, // Default ticket type; adjust as needed
+                        Price = model.BasePrice,
+                        IsReserved = false // Tickets are not reserved initially
+                    });
+                }
+
+                _context.Tickets.AddRange(tickets);*/
+                _context.Tickets.Add(ticket);
+                await _context.SaveChangesAsync(); // Save tickets to the database
+                TempData["SuccessMessage"] = "Event created successfully!";
+                return RedirectToAction("Index");
+            }
+            // Log validation errors for debugging
+            foreach (var modelStateKey in ModelState.Keys)
+            {
+                var errors = ModelState[modelStateKey]?.Errors;
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Key: {modelStateKey}, Error: {error.ErrorMessage}");
+                }
             }
 
-            // If the model state is not valid, show the form again
-            ViewBag.Categories = Enum.GetValues(typeof(EventCategory)).Cast<EventCategory>().ToList();
-            return View(@event);
-        }*/
-        public IActionResult Calendar()
-        {
-            var events = _context.Events.Select(e => new {
-                e.Title,
-                Start = e.Date.ToString("yyyy-MM-dd HH:mm:ss"),
-                End = e.Date.AddHours(1).ToString("yyyy-MM-dd HH:mm:ss") // assuming 1 hour duration
-            }).ToList();
-
-            var eventsJson = JsonConvert.SerializeObject(events);
-            ViewData["EventsJson"] = eventsJson;
-
-            return View();
+            return View(model);
         }
 
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var @event = await _context.Events
-                .Include(e => e.Organizer) // Include related data if necessary
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (@event == null)
-            {
-                return NotFound();
-            }
-
-            return View(@event);
-        }
-
-        [Authorize] // Optional: Add authorization if you want to restrict this to only logged-in users
+        // GET: /Event/Edit/{id}
+        [Authorize(Roles = "Organizer")]
         public async Task<IActionResult> Edit(int id)
         {
             var eventToEdit = await _context.Events.FindAsync(id);
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            if (eventToEdit == null)
+            if (eventToEdit == null || eventToEdit.OrganizerId != userId)
             {
-                return NotFound();
+                return Unauthorized();
             }
 
             return View(eventToEdit);
         }
 
+        // POST: /Event/Edit/{id}
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize] // Optional: Add authorization if needed
-        public async Task<IActionResult> Edit(int id, Event updatedEvent)
+        [Authorize(Roles = "Organizer")]
+        public async Task<IActionResult> Edit(int id, Event model)
         {
-            if (id != updatedEvent.Id)
+            /*if (id != model.Id)
             {
-                return NotFound();
-            }
+                return BadRequest();
+            }*/
 
             if (ModelState.IsValid)
             {
-                try
+                var eventToUpdate = await _context.Events.FindAsync(id);
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+                if (eventToUpdate == null || eventToUpdate.OrganizerId != userId)
                 {
-                    _context.Update(updatedEvent);
-                    await _context.SaveChangesAsync();
+                    return Unauthorized();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EventExists(updatedEvent.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index)); // Redirect to Index or any other page after successful update
+
+                eventToUpdate.Name = model.Name;
+                eventToUpdate.Description = model.Description;
+                eventToUpdate.Date = model.Date;
+                eventToUpdate.Venue = model.Venue;
+                eventToUpdate.Category = model.Category;
+
+                _context.Update(eventToUpdate);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("MyEvents");
             }
 
-            return View(updatedEvent);
-
+            return View(model);
         }
 
-        private bool EventExists(int id)
-        {
-            return _context.Events.Any(e => e.Id == id);
-        }
-
-        // GET: Event/Delete/{id}
-        [Authorize] // Optional: Add authorization if you want to restrict access
+        // GET: /Event/Delete/{id}
+        [Authorize(Roles = "Organizer")]
         public async Task<IActionResult> Delete(int id)
         {
-            var eventToDelete = await _context.Events
-                .FirstOrDefaultAsync(e => e.Id == id);
+            var eventToDelete = await _context.Events.FindAsync(id);
 
-            if (eventToDelete == null)
+            if (eventToDelete == null || eventToDelete.OrganizerId != User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
             {
-                return NotFound();
+                return Unauthorized();
             }
 
             return View(eventToDelete);
         }
 
-        // POST: Event/Delete/{id}
+        // POST: /Event/Delete/{id}
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [Authorize] // Optional: Add authorization if needed
+        [Authorize(Roles = "Organizer")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var eventToDelete = await _context.Events
-                .FindAsync(id);
+            var eventToDelete = await _context.Events.FindAsync(id);
 
-            if (eventToDelete == null)
+            if (eventToDelete == null || eventToDelete.OrganizerId != User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
             {
-                return NotFound();
+                return Unauthorized();
             }
 
             _context.Events.Remove(eventToDelete);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index)); // Redirect to Index or another page after deletion
+            return RedirectToAction("MyEvents");
+        }
+
+        // GET: /Event/MyEvents
+        [Authorize(Roles = "Organizer")]
+        public async Task<IActionResult> MyEvents()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var myEvents = await _context.Events
+                .Where(e => e.OrganizerId == userId)
+                .ToListAsync();
+
+            return View(myEvents);
         }
     }
 }
