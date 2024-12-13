@@ -3,6 +3,7 @@ using System;
 using Event_Management_and_Ticket_Booking_System.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Management_and_Ticket_Booking_System.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241128073540_NewMigration")]
+    partial class NewMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -174,6 +177,7 @@ namespace Event_Management_and_Ticket_Booking_System.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OrganizerId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TotalSeats")
@@ -297,6 +301,7 @@ namespace Event_Management_and_Ticket_Booking_System.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("BuyerId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("EventId")
@@ -493,7 +498,8 @@ namespace Event_Management_and_Ticket_Booking_System.Migrations
                     b.HasOne("Event_Management_and_Ticket_Booking_System.Models.Entities.ApplicationUser", "Organizer")
                         .WithMany("OrganizedEvents")
                         .HasForeignKey("OrganizerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Organizer");
                 });
@@ -552,7 +558,8 @@ namespace Event_Management_and_Ticket_Booking_System.Migrations
                     b.HasOne("Event_Management_and_Ticket_Booking_System.Models.Entities.ApplicationUser", "Buyer")
                         .WithMany("PurchasedTickets")
                         .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
 
                     b.HasOne("Event_Management_and_Ticket_Booking_System.Models.Entities.Event", "Event")
                         .WithMany("Tickets")

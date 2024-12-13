@@ -1,8 +1,8 @@
 ﻿@using Event_Management_and_Ticket_Booking_System.Models.Entities
 @using Event_Management_and_Ticket_Booking_System.Models.ViewModels
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<User> SignInManager
-@inject UserManager<User> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,46 +12,84 @@
     <title>@ViewData["Title"] - Event_Management_and_Ticket_Booking_System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/events.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Event_Management_and_Ticket_Booking_System.styles.css" asp-append-version="true" />
+
 </head>
 <body>
+    <!-- Navbar -->
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="color:blue;">Tickify</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Tickify</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-controller="Event" asp-action="Index">Events</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Cart" asp-action="Index">Cart</a>
                         </li>
                         @if (SignInManager.IsSignedIn(User))
-                            {
-                                <li>
-                                    <form id="logoutForm" action="@Url.Action("Logout", "Account")" method="post">
-                                        <button type="submit">Logout</button>
-                                    </form>
-                                </li>
-                            }
-                            else
-                            {
-                                <li><a href="@Url.Action("Login", "Account")">Login</a></li>
-                                <li><a href="@Url.Action("Register", "Account")">Register</a></li>
-                            }
-                        
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    My Account
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Booking" asp-action="MyBookings">My Bookings</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Event" asp-action="MyEvents">My Events</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Event" asp-action="Create">Create Event</a></li>
+                                    
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="EditProfile">Edit Profile</a></li>
+                                    <li>
+                                        <form id="logoutForm" asp-controller="Account" asp-action="Logout" method="post">
+                                            <button class="dropdown-item" type="submit">Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
+    <!-- Success Message -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Main Content -->
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            &copy; @DateTime.Now.Year - Tickify | <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
 
     @* <footer class="border-top footer text-muted">
         <div class="container">
@@ -61,6 +99,10 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.13/jquery.validate.unobtrusive.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
