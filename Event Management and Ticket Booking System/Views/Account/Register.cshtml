@@ -7,48 +7,38 @@
     ViewData["Title"] = "Register";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2>Register</h2>
 
-<form asp-action="Register" method="post" class="form-horizontal">
+<form asp-action="Register" method="post">
     <div class="form-group">
-        <label for="FullName" class="control-label">Full Name</label>
-        <input asp-for="FullName" class="form-control" id="FullName" />
-        <span asp-validation-for="FullName" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label for="Email" class="control-label">Email</label>
-        <input asp-for="Email" class="form-control" id="Email" />
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
-
     <div class="form-group">
-        <label for="Password" class="control-label">Password</label>
-        <input asp-for="Password" class="form-control" id="Password" type="password" />
+        <label asp-for="Password"></label>
+        <input asp-for="Password" class="form-control" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
-
     <div class="form-group">
-        <label for="ConfirmPassword" class="control-label">Confirm Password</label>
-        <input asp-for="ConfirmPassword" class="form-control" id="ConfirmPassword" type="password" />
+        <label asp-for="ConfirmPassword"></label>
+        <input asp-for="ConfirmPassword" class="form-control" />
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
-
     <div class="form-group">
-        <label for="Role" class="control-label">Role</label>
-        <select asp-for="Role" class="form-control" id="Role">
-            <option value="Organizer">Organizer</option>
+        <label asp-for="Role"></label>
+        <select asp-for="Role" class="form-control">
             <option value="Attendee">Attendee</option>
+            <option value="Organizer">Organizer</option>
             <option value="Admin">Admin</option>
         </select>
         <span asp-validation-for="Role" class="text-danger"></span>
     </div>
-
     <button type="submit" class="btn btn-primary">Register</button>
 </form>
 
-@section Scripts {
+@* @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
+} *@

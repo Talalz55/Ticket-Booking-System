@@ -8,41 +8,51 @@ namespace Event_Management_and_Ticket_Booking_System.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
+        // Registration
         [HttpGet]
-        public IActionResult Register() => View();
+        public IActionResult Register()
+        {
+            return View();
+        }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var user = new User
+                var user = new ApplicationUser
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    FullName = model.FullName,
-                    Role = model.Role
+                    Role = model.Role // Selected role (e.g., Admin, Organizer, Attendee)
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    // Assign role to the user
+                    if (!await _roleManager.RoleExistsAsync(model.Role))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(model.Role));
+                    }
                     await _userManager.AddToRoleAsync(user, model.Role);
 
-                    // Automatically sign in the user after registration
                     await _signInManager.SignInAsync(user, isPersistent: false);
-
-                    return RedirectToAction("Index", "Home"); // Redirect to Home or Dashboard
+                    return RedirectToAction("Index", "Home");
                 }
 
                 foreach (var error in result.Errors)
@@ -51,48 +61,42 @@ namespace Event_Management_and_Ticket_Booking_System.Controllers
                 }
             }
 
+            // Add this to log validation errors for debugging
+            foreach (var modelStateKey in ModelState.Keys)
+            {
+                var errors = ModelState[modelStateKey]?.Errors;
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Key: {modelStateKey}, Error: {error.ErrorMessage}");
+                }
+            }
             return View(model);
         }
 
+        // Login
         [HttpGet]
-        public IActionResult Login() => View();
-        // Handle login
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        public IActionResult Login()
         {
-            returnUrl ??= Url.Content("~/"); // Default return to home page if no returnUrl is provided
+            return View();
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
             if (ModelState.IsValid)
             {
-                // Attempt to sign in the user
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    return RedirectToLocal(returnUrl); // Redirect to the page the user came from, or home
+                    return RedirectToAction("Index", "Home");
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                }
-            }
 
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            }
             return View(model);
         }
 
-        private IActionResult RedirectToLocal(string returnUrl)
-        {
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl); // Redirect to the requested local URL
-            }
-            else
-            {
-                return RedirectToAction(nameof(HomeController.Index), "Home"); // Default fallback
-            }
-        }
-
+        // Logout
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
@@ -100,81 +104,57 @@ namespace Event_Management_and_Ticket_Booking_System.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: Profile
+        // Access Denied
         [HttpGet]
-        public async Task<IActionResult> Profile()
+        public IActionResult AccessDenied()
         {
-            var user = await _userManager.GetUserAsync(User);
-            return View(user);
+            return View();
         }
-        /*        public async Task<IActionResult> Profile()
-                {
-                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get the logged-in user's ID
-                    var user = await _userManager.FindByIdAsync(userId);
-                    if (user == null)
-                    {
-                        return NotFound();
-                    }
 
-                    return View(user);
-                }*/
+        [HttpGet]
         public async Task<IActionResult> EditProfile()
         {
             var user = await _userManager.GetUserAsync(User);
-            return View(user);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var model = new EditProfileViewModel
+            {
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+            };
+            return View(model);
         }
-        // POST: Edit Profile
+
         [HttpPost]
-        public async Task<IActionResult> EditProfile(User model)
+        public async Task<IActionResult> EditProfile(EditProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
-                user.FullName = model.FullName;
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
                 user.Email = model.Email;
-                // Update other properties as needed
+                user.PhoneNumber = model.PhoneNumber;
 
                 var result = await _userManager.UpdateAsync(user);
-
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Profile");
+                    TempData["SuccessMessage"] = "Profile updated successfully!";
+                    return RedirectToAction("Index", "Home");
                 }
-                else
+
+                foreach (var error in result.Errors)
                 {
-                    // Handle error (e.g., show a message to the user)
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
-
             return View(model);
         }
-
-        // POST: Update Profile
-        /*[HttpPost]
-        public async Task<IActionResult> UpdateProfile(User model)
-        {
-            if (ModelState.IsValid)
-            {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var user = await _userManager.FindByIdAsync(userId);
-
-                if (user != null)
-                {
-                    user.UserName = model.FullName;
-
-                    var result = await _userManager.UpdateAsync(user);
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Profile");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Unable to update profile.");
-                    }
-                }
-            }
-
-            return View("Profile", model);
-        }*/
     }
 }
