@@ -1,0 +1,19 @@
+﻿@using Event_Management_and_Ticket_Booking_System.Models.Entities
+@using Event_Management_and_Ticket_Booking_System.Models.ViewModels
+@model Ticket
+
+<h2>Add Ticket to Cart</h2>
+
+<p><strong>Event:</strong> @Model.Event.Name</p>
+<p><strong>Ticket Type:</strong> @Model.Type</p>
+<p><strong>Price:</strong> @Model.Price.ToString("C")</p>
+
+<form asp-action="Add" method="post">
+    <input type="hidden" name="ticketId" value="@Model.Id" />
+    <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <input type="number" name="quantity" min="1" value="1" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Add to Cart</button>
+    <a asp-action="Index" asp-controller="Event" class="btn btn-secondary">Cancel</a>
+</form>
